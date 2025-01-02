@@ -11,3 +11,5 @@ export const setLocationObject = (locationObj, coordsObj) => {
   export const getHomeLocation = () => {
     return localStorage.getItem("defaultWeatherLocation");
   };
+
+  

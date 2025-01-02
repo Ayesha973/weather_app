@@ -1,5 +1,5 @@
 import { setLocationObject, getHomeLocation } from "./dataFunctions.js";
-import {addSpinner, displayError} from "./domFunctions.js";
+import {addSpinner, displayError, updateScreenReaderConfirmation} from "./domFunctions.js";
 import CurrentLocation from "./CurrentLocation.js"
 const currentLoc = new CurrentLocation();
 
@@ -19,8 +19,14 @@ const initApp = () => {
     geoButton.addEventListener("click", getGeoWeather);
     const homeButton = document.getElementById("home");
     homeButton.addEventListener("click", loadWeather);
-    const saveButton = document.getElementById("Save Location")
-
+    const saveButton = document.getElementById("saveLocation")
+    saveButton.addEventListener("click", saveLocation);
+    const unitButton = document.getElementById("unit");
+    unitButton.addEventListener("click", setUnit);
+    const refreshtButton = document.getElementById("refresh");
+    refreshButton.addEventListener("click", refreshWeather);
+    const locationEntry = document.getElementById("searchBar_form");
+    locationEntry.addEventListener("submit", submitNewLocation);
     //set up 
 
 
@@ -95,7 +101,45 @@ const displayHomeLocationWeather = (home) => {
         setLocationObject(currentLoc, myCoordsObj);
         updateDataAndDisplay(currentLoc);
     }
+};
+
+const saveLocation = () => {
+    if (currentLoc.getLat() && currentLoc.getLong()) {
+        const saveIcon = document.querySelector(".fa-save");
+        addSpinner(saveIcon);
+        const location = {
+            name : currentLoc.getName(),
+            lat  : currentLoc.getLat(),
+            long : currentLoc.getLong(),
+            unit : currentLoc.getUnit()
+        };
+        localStorage.setItem("defaultWeatherLocation", JSON.stringify(location));
+        updateScreenReaderConfirmation(
+            "Saved ${currentLoc.getName()} as home location." 
+        )
+    }
+};
+
+const setUnitPref = () => {
+    const unitIcon  = document.querySelector(".fa-chart-bar");
+    addSpinner(unitIcon);
+    currentLoc.toggleUnit();
+    updateDataAndDisplay(currentLoc);
+};
+
+const refreshWeather = () => {
+    const refreshIcon  = document.querySelector(".fa-sync-alt");
+    addSpinner(refreshIconIcon);
+    updateDataAndDisplay(currentLoc);
+};
+
+const submitNewLocation = async (event) => {
+    event.preventDefault();
+    const text = document.getElementById("searchBar_text").value;
+    const entryText = cleanText(text);
+    if (entryText.length) return;
 }
+
 const updateDataAndDisplay = async (locationObj) => {
     console.log("update and display called: ", locationObj);
 
